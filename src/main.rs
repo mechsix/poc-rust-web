@@ -1,12 +1,16 @@
 mod ctl;
+mod db;
 
-use actix_web::{App, HttpServer};
+use actix_web::{App, HttpServer, web};
 
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    HttpServer::new(|| {
+    let db_pool = db::get_pool();
+
+    HttpServer::new(move || {
         App::new()
+            .app_data(web::Data::new(db_pool.clone()))
             .service(ctl::product_list_controller)
             .service(ctl::product_detail_controller)
             .service(ctl::product_updating_controller)
